@@ -1,16 +1,14 @@
 <?php
-    $host = "127.0.0.1";
-    $usuario = "root";
-    $senha = "";
-    $banco = "lojaonline";
 
-    $conexao = mysqli_connect($host, $usuario, $senha, $banco);
+$host = "localhost";
+$db = "loja";
+$user = "root";
+$pass = "";
 
-    if(!$conexao){
-        die("Erro de conexão: " . mysqli_connect_error());
-    }else{
-        echo "Conexão realizada com sucesso <br>";
+try{
+    $pdo = new PDO('mysql:host='.$host.';dbname='.$db.';charset=utf8',$user,$pass);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    }catch(PDOException $e){
+        die("Erro ao conectar".$e->getMessage());
     }
-
-    //mysqli_close($conexao);
 ?>
