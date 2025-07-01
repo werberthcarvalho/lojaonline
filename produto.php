@@ -1,26 +1,27 @@
 <?php
 require("conexao.php");
 
-if(isset($_POST['btnApagar'])){
+// Apagar produto (seguro com prepared statement)
+if (isset($_POST['btnApagar'])) {
     $id = $_POST['btnApagar'];
-    $sql = "DELETE FROM Produto WHERE id = $id";
-    $result = $conexao->query($sql);
+    $sql = "DELETE FROM produto WHERE id = ?";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$id]);
 }
 ?>
-
 
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/style.css">
     <title>Produtos</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <h1>Listagem de produtos</h1>
 
-    <table border=1 >
+    <table border="1">
         <tr>
             <th>ID</th>
             <th>Nome</th>
@@ -28,24 +29,32 @@ if(isset($_POST['btnApagar'])){
             <th>Editar</th>
             <th>Apagar</th>
         </tr>
+
         <?php 
         $resultado = $pdo->query("SELECT * FROM produto");
-        while($linha = $resultado->fetch(PDO::FETCH_ASSOC)):?>
+        while($linha = $resultado->fetch(PDO::FETCH_ASSOC)): ?>
         <tr>
-            <td><?php echo $linha['id'] ?></td>
-            <td><?php echo $linha['nome'] ?></td>
-            <td><?php echo "R$ " . $linha ['preco'] ?></td>
-            <td>Editar</td>
-            <td><form action="excluir.php" method="POST">
-                <button type="submit" name="btnApagar" value="<?php echo $linha['id'] ?>">Apagar</button>
+            <td><?= $linha['id'] ?></td>
+            <td><?= $linha['nome'] ?></td>
+            <td>R$ <?= $linha['preco'] ?></td>
+
+            <!-- Botão Editar -->
+            <td>
+                <a href="editar.php?id=<?= $linha['id'] ?>">Editar</a>
+            </td>
+
+            <!-- Botão Apagar -->
+            <td>
+                <form action="index.php" method="POST">
+                    <button type="submit" name="btnApagar" value="<?= $linha['id'] ?>">Apagar</button>
                 </form>
             </td>
         </tr>
         <?php endwhile; ?>
     </table>
-    <form action="cadProduto.php" method="">
-    <button type="submit">Novo Produto</button>
-    </form>
 
+    <form action="cadProduto.php" method="get">
+        <button type="submit">Novo Produto</button>
+    </form>
 </body>
 </html>
